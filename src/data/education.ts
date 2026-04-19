@@ -9,18 +9,6 @@ export interface EducationItem {
 
 const education: EducationItem[] = [
   {
-    degree: "Postgraduate Professional Diploma in Practical AI for Software Developers",
-    institution: "University of Galway",
-    period: "September 2025 – Expected May 2026",
-    location: "Galway, Ireland",
-    bullets: [
-      "Python, NumPy/Pandas/Matplotlib, and ML tooling workflows.",
-      "Supervised learning, model evaluation, linear and probabilistic models.",
-      "MLOps concepts: packaging, serving, and optimizing models for different environments.",
-      "Critical analysis of AI impact and technology readiness.",
-    ],
-  },
-  {
     degree: "BSc (Honours) Computer Science Infrastructure",
     institution: "Technological University Dublin, Kevin Street Campus",
     period: "2020",
