@@ -1,0 +1,182 @@
+---
+import type { EducationItem } from "../data/education";
+
+interface Props {
+  items: EducationItem[];
+  certifications: string[];
+}
+
+const { items, certifications } = Astro.props;
+---
+
+<section class="section" id="education">
+  <div class="section-inner">
+    <h2 class="section-title">Education</h2>
+
+    <div class="edu-list">
+      {items.map((item, i) => (
+        <article class="edu-entry" data-animate style={`--delay: ${i * 80}ms`}>
+          <div class="edu-meta">
+            <span class="period">{item.period}</span>
+            <span class="location">{item.location}</span>
+          </div>
+          <div class="edu-body">
+            <h3 class="degree">{item.degree}</h3>
+            <p class="institution">
+              {item.institution}
+              {item.grade && <span class="grade">{item.grade}</span>}
+            </p>
+            <ul class="bullets">
+              {item.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {certifications.length > 0 && (
+      <div class="certs">
+        <h3 class="certs-label">Certifications</h3>
+        <ul class="cert-list">
+          {certifications.map((c) => (
+            <li class="cert-pill">{c}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .edu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .edu-entry {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .edu-entry:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent),
+                0 8px 28px -6px color-mix(in srgb, var(--accent) 10%, transparent);
+    transform: translateY(-2px);
+  }
+
+  @media (min-width: 640px) {
+    .edu-entry {
+      grid-template-columns: 9rem 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .edu-meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .edu-meta {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-top: 0.15rem;
+    }
+  }
+
+  .period {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .location {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .degree {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .institution {
+    font-size: 0.875rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 0.2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .grade {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 400;
+  }
+
+  .bullets {
+    margin-top: 0.85rem;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .bullets li {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* Certifications subsection */
+  .certs {
+    margin-top: 2.5rem;
+  }
+
+  .certs-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .cert-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+
+  .cert-pill {
+    padding: 0.45rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    /* Subtle left accent using box-shadow so no pseudo-element is needed */
+    box-shadow: inset 3px 0 0 var(--accent-2);
+  }
+</style>

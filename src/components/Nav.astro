@@ -1,0 +1,119 @@
+---
+// Nav links must match the section IDs in each component.
+const links = [
+  { label: "About",      href: "#about" },
+  { label: "Experience", href: "#experience" },
+  { label: "Education",  href: "#education" },
+  { label: "Skills",     href: "#skills" },
+  { label: "Projects",   href: "#projects" },
+  { label: "Contact",    href: "#contact" },
+];
+---
+
+<header>
+  <nav>
+    <ul>
+      {links.map((l) => (
+        <li><a href={l.href}>{l.label}</a></li>
+      ))}
+    </ul>
+
+    <button id="theme-toggle" aria-label="Toggle light/dark mode">
+      <!-- Sun icon — shown in dark mode -->
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <!-- Moon icon — shown in light mode -->
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById("theme-toggle")!;
+
+  btn.addEventListener("click", () => {
+    const isLight = document.documentElement.classList.toggle("light");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+  });
+</script>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
+  }
+
+  a {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  a:hover {
+    color: var(--text);
+    background: var(--bg-hover);
+    text-decoration: none;
+  }
+
+  /* Active state set by the IntersectionObserver in Layout.astro */
+  a.active {
+    color: var(--text);
+    background: var(--bg-hover);
+  }
+
+  #theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+
+  #theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: var(--bg-hover);
+  }
+
+  /* Show sun in dark mode, moon in light mode */
+  .icon-moon { display: none; }
+
+  :global(html.light) .icon-sun  { display: none; }
+  :global(html.light) .icon-moon { display: block; }
+</style>

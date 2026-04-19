@@ -1,0 +1,131 @@
+---
+import type { ProjectItem } from "../data/projects";
+
+interface Props {
+  items: ProjectItem[];
+}
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="section" id="projects">
+    <div class="section-inner">
+      <h2 class="section-title">Projects</h2>
+
+      <div class="projects-grid">
+        {items.map((project, i) => (
+          <article class="project-card" data-animate style={`--delay: ${i * 70}ms`}>
+            <div class="card-top">
+              <h3 class="project-title">{project.title}</h3>
+              <div class="card-links">
+                {project.url && (
+                  <a href={project.url} target="_blank" rel="noopener noreferrer" aria-label="Live site" class="icon-link">
+                    <!-- External link icon -->
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                  </a>
+                )}
+                {project.repo && (
+                  <a href={project.repo} target="_blank" rel="noopener noreferrer" aria-label="Source code" class="icon-link">
+                    <!-- GitHub mark icon -->
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <p class="project-desc">{project.description}</p>
+
+            <ul class="tech-list">
+              {project.tech.map((t) => (
+                <li class="tech-tag">{t}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 1.25rem;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .project-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent),
+                0 8px 28px -6px color-mix(in srgb, var(--accent) 10%, transparent);
+    transform: translateY(-3px);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .project-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .card-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .icon-link {
+    color: var(--text-dim);
+    display: flex;
+    transition: color 0.15s;
+  }
+
+  .icon-link:hover { color: var(--accent); }
+
+  .project-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .tech-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: auto;
+  }
+
+  .tech-tag {
+    padding: 0.2rem 0.55rem;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+  }
+</style>

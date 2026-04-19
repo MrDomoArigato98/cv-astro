@@ -1,0 +1,159 @@
+---
+import type { Profile } from "../data/profile";
+
+interface Props {
+  profile: Profile;
+}
+
+const { profile } = Astro.props;
+---
+
+<section class="section hero" id="about">
+  <div class="section-inner">
+    <div class="hero-top">
+      <div class="name-block">
+        <h1>{profile.name}</h1>
+        <p class="title">{profile.title}</p>
+        <p class="location">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          {profile.location}
+        </p>
+      </div>
+
+      <nav class="links" aria-label="Contact and social links">
+        <a href={`mailto:${profile.email}`} class="link-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
+          </svg>
+          Email
+        </a>
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="link-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+          </svg>
+          LinkedIn
+        </a>
+        <a href={profile.website} target="_blank" rel="noopener noreferrer" class="link-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          Website
+        </a>
+      </nav>
+    </div>
+
+    <p class="summary">{profile.summary}</p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+    overflow: hidden;
+  }
+
+  /* Radial accent glow behind the name — purely decorative depth */
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 420px;
+    background: radial-gradient(
+      ellipse at 50% 30%,
+      color-mix(in srgb, var(--accent) 9%, transparent) 0%,
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+
+  .section-inner { position: relative; }
+
+  .hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  /* ── Staggered entrance animations ────────────────────────────
+     Each element slides up and fades in. `animation-fill-mode: both`
+     keeps the element invisible before the delay fires.              */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  h1       { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+  .title   { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+  .location{ animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+  .links   { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both; }
+  .summary { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.15;
+  }
+
+  .title {
+    font-size: 1rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 0.35rem;
+  }
+
+  .location {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+  }
+
+  .link-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+
+  .link-pill:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--bg-hover);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 18%, transparent);
+    text-decoration: none;
+  }
+
+  .summary {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    max-width: 72ch;
+    line-height: 1.8;
+  }
+</style>

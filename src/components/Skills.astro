@@ -1,0 +1,77 @@
+---
+import type { SkillCategory } from "../data/skills";
+
+interface Props {
+  categories: SkillCategory[];
+}
+
+const { categories } = Astro.props;
+---
+
+<section class="section" id="skills">
+  <div class="section-inner">
+    <h2 class="section-title">Skills</h2>
+
+    <div class="skills-grid">
+      {categories.map((cat, i) => (
+        <div class="skill-group" data-animate style={`--delay: ${i * 60}ms`}>
+          <h3 class="cat-name">{cat.category}</h3>
+          <ul class="tag-list">
+            {cat.items.map((item) => (
+              <li class="tag">{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills-grid {
+    display: grid;
+    /* Auto-fill so columns collapse naturally on narrow screens */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 1.25rem;
+  }
+
+  .skill-group {
+    padding: 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .skill-group:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .cat-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.875rem;
+  }
+
+  .tag-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    padding: 0.25rem 0.65rem;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+</style>

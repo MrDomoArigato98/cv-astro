@@ -1,0 +1,187 @@
+---
+import type { Profile } from "../data/profile";
+
+interface Props {
+  profile: Profile;
+}
+
+const { profile } = Astro.props;
+
+const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${profile.location}.`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={metaDescription} />
+    <meta name="author" content={profile.name} />
+    <title>{profile.name} — CV</title>
+    <!-- Read saved theme before first paint to avoid a flash of dark/light -->
+    <script is:inline>
+      if (localStorage.getItem("theme") === "light") document.documentElement.classList.add("light");
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* ─── Design tokens ─────────────────────────────────────────── */
+  :root {
+    --bg:        #111117;
+    --bg-card:   #17171f;
+    --bg-hover:  #1d1d28;
+    --border:    #2a2a3c;
+    --accent:    #7b9fff;
+    --accent-2:  #b09df5;
+    --text:      #eeeef4;
+    --text-muted:#9898b8;
+    --text-dim:  #63637a;
+
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+
+    --radius:    8px;
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --section-gap: 5rem;
+    --content-width: 860px;
+  }
+
+  /* Light mode — only colour tokens need overriding */
+  html.light {
+    --bg:        #f4f4f8;
+    --bg-card:   #ffffff;
+    --bg-hover:  #ebebf2;
+    --border:    #d8d8e8;
+    --accent:    #4a6ef5;
+    --accent-2:  #7c5cf0;
+    --text:      #111117;
+    --text-muted:#4a4a65;
+    --text-dim:  #8888a0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: clamp(15px, 1.1vw, 17px);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    /* Smooth colour transition when toggling theme */
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; }
+
+  .section {
+    padding: var(--section-gap) 1.25rem;
+  }
+
+  .section-inner {
+    max-width: var(--content-width);
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--border);
+  }
+
+  /* ─── Scroll-reveal ─────────────────────────────────────────── */
+  /* Elements marked data-animate start invisible and slide up */
+  [data-animate] {
+    opacity: 0;
+    transform: translateY(22px);
+    /* Use --delay CSS var so each card in a list can stagger */
+    transition:
+      opacity 0.55s var(--ease-spring) var(--delay, 0ms),
+      transform 0.55s var(--ease-spring) var(--delay, 0ms);
+  }
+
+  [data-animate].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Honour the OS preference — skip all animations */
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    * { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+  }
+</style>
+
+<script>
+  // ── Scroll-reveal ──────────────────────────────────────────────
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target); // fire once
+        }
+      });
+    },
+    { threshold: 0.01 }
+  );
+
+  document.querySelectorAll("[data-animate]").forEach((el) => revealObserver.observe(el));
+
+  // ── Nav active state ───────────────────────────────────────────
+  // rootMargin centres the trigger zone in the viewport, so the active
+  // link updates when a section occupies the middle band of the screen.
+  const navObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        document.querySelectorAll("header nav a[href^='#']").forEach((link) => {
+          link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
+        });
+      });
+    },
+    { rootMargin: "-40% 0px -55% 0px" }
+  );
+
+  document.querySelectorAll("section[id]").forEach((s) => navObserver.observe(s));
+</script>
