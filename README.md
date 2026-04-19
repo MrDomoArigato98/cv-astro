@@ -30,84 +30,6 @@ src/
 
 ---
 
-## Data schemas
-
-### `profile.ts`
-
-```ts
-{
-  name:     string;   // Full name
-  title:    string;   // One-line role title
-  location: string;   // City, Country
-  email:    string;
-  phone:    string;
-  linkedin: string;   // Full URL
-  website:  string;   // Full URL
-  summary:  string;   // Hero paragraph
-}
-```
-
-### `experience.ts`
-
-Array of `ExperienceItem`:
-
-```ts
-{
-  title:    string;    // Job title
-  company:  string;
-  level?:   string;    // Optional level badge, e.g. "L5"
-  period:   string;    // e.g. "June 2023 – Nov 2024"
-  location: string;
-  bullets:  string[];  // Achievements / responsibilities
-}
-```
-
-### `education.ts`
-
-Default export — array of `EducationItem`:
-
-```ts
-{
-  degree:      string;
-  institution: string;
-  period:      string;
-  location:    string;
-  grade?:      string;   // Optional honour / classification
-  bullets:     string[];
-}
-```
-
-Named export `certifications` — `string[]` rendered as pills beneath the education list.
-
-### `skills.ts`
-
-Array of `SkillCategory`:
-
-```ts
-{
-  category: string;   // Section heading
-  items:    string[]; // Individual skill tags
-}
-```
-
-### `projects.ts`
-
-Array of `ProjectItem`:
-
-```ts
-{
-  title:       string;
-  description: string;
-  tech:        string[];  // Tech stack tags
-  url?:        string;    // Live site URL
-  repo?:       string;    // Source code URL
-}
-```
-
-> The Projects section is **hidden automatically** when the array is empty.
-
----
-
 ## Running locally
 
 ```bash
@@ -124,18 +46,7 @@ npm run preview  # preview the built output locally
 
 ---
 
-## Deploying to Vercel
-
-1. Push the repo to GitHub.
-2. Import the repo in [vercel.com/new](https://vercel.com/new).
-3. Vercel detects Astro automatically. The `vercel.json` confirms the build command and output directory.
-4. Click **Deploy**.
-
-For a custom domain, add it under **Project → Settings → Domains** in the Vercel dashboard.
-
----
-
-## Customisation tips
+## Customisation
 
 - **Design tokens** (colours, fonts, spacing) are CSS variables defined in `src/layouts/Layout.astro` inside the `:root` block.
 - **Accent colour** — change `--accent` and `--accent-2` to update the highlight colour across the whole site.

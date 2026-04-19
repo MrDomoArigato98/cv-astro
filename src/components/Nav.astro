@@ -1,5 +1,4 @@
 ---
-// Nav links must match the section IDs in each component.
 const links = [
   { label: "About",      href: "#about" },
   { label: "Experience", href: "#experience" },
@@ -12,19 +11,21 @@ const links = [
 
 <header>
   <nav>
-    <ul>
-      {links.map((l) => (
-        <li><a href={l.href}>{l.label}</a></li>
-      ))}
-    </ul>
+    <!-- Scroll wrapper isolates the link strip so the toggle button
+         stays pinned to the right while only the links scroll.       -->
+    <div class="link-scroll">
+      <ul>
+        {links.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
 
     <button id="theme-toggle" aria-label="Toggle light/dark mode">
-      <!-- Sun icon — shown in dark mode -->
       <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="4"/>
         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
       </svg>
-      <!-- Moon icon — shown in light mode -->
       <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
@@ -34,7 +35,6 @@ const links = [
 
 <script>
   const btn = document.getElementById("theme-toggle")!;
-
   btn.addEventListener("click", () => {
     const isLight = document.documentElement.classList.toggle("light");
     localStorage.setItem("theme", isLight ? "light" : "dark");
@@ -55,24 +55,38 @@ const links = [
   nav {
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: 0 1.25rem;
+    /* Horizontal padding only on the button side; link-scroll handles its own */
+    padding: 0 1.25rem 0 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
   }
+
+  /* Scrollable strip — hides the scrollbar on all browsers while staying accessible */
+  .link-scroll {
+    flex: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 1.25rem;
+  }
+  .link-scroll::-webkit-scrollbar { display: none; }
 
   ul {
     list-style: none;
     display: flex;
-    flex-wrap: wrap;
+    /* Never wrap — overflow scrolls instead */
+    flex-wrap: nowrap;
     gap: 0.25rem;
     padding: 0.5rem 0;
+    width: max-content;
   }
 
   a {
     display: block;
     padding: 0.35rem 0.75rem;
     font-size: 0.8125rem;
+    white-space: nowrap;
     color: var(--text-muted);
     border-radius: 4px;
     transition: color 0.2s, background 0.2s;
@@ -84,7 +98,6 @@ const links = [
     text-decoration: none;
   }
 
-  /* Active state set by the IntersectionObserver in Layout.astro */
   a.active {
     color: var(--text);
     background: var(--bg-hover);
@@ -96,12 +109,12 @@ const links = [
     justify-content: center;
     width: 2rem;
     height: 2rem;
+    flex-shrink: 0;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: var(--bg-card);
     color: var(--text-muted);
     cursor: pointer;
-    flex-shrink: 0;
     transition: color 0.2s, border-color 0.2s, background 0.2s;
   }
 
@@ -111,9 +124,7 @@ const links = [
     background: var(--bg-hover);
   }
 
-  /* Show sun in dark mode, moon in light mode */
   .icon-moon { display: none; }
-
   :global(html.light) .icon-sun  { display: none; }
   :global(html.light) .icon-moon { display: block; }
 </style>

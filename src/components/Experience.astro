@@ -53,7 +53,7 @@ const { items } = Astro.props;
     /* Meta column is fixed; body takes the rest */
     grid-template-columns: 1fr;
     gap: 0.5rem;
-    padding: 1.5rem;
+    padding: clamp(1rem, 4vw, 1.5rem);
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
