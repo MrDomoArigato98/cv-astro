@@ -30,7 +30,7 @@ const profile: Profile = {
     "I enjoy fixing things, solving problems, and \"Building\" — getting things done.",
     "With modern AI I'm quite enjoying the freedom of learning and creating projects that for one person before would be an insurmountable hill. I'm fond of using it, as another tool in my toolbelt. However I won't sit here and tell you that I'm happy I can't buy a modern Graphics Card, RAM or storage for my computer.",
     "I had my share of corporate experience: AWS Dublin (4.5 years there). Now I'm working in Collibra in Prague as an IT Infrastructure Engineer, which gives me more freedom and options to touch more technologies, and build projects for the organisation.",
-    "I have great attention to detail (I've been recurringly told), fantastic interpersonal skills (turns out patience transfers between fields better than most tech skills do — thanks, Tesco), and I'll happily take on something I have no idea how to do yet — figuring it out as I go is half the fun.",
+    "I have great attention to detail and quality (I've been recurringly told), fantastic interpersonal skills (turns out patience transfers between fields better than most tech skills do — thanks, Tesco), and I'll happily take on something I have no idea how to do yet — figuring it out as I go is half the fun.",
   ],
   summaryCorpo: [
     "Technical & Solutions Engineer with nearly 5 years of hands-on experience across cloud support, infrastructure engineering, and internal tooling — starting at AWS in Dublin, now at Collibra in Prague.",
