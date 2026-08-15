@@ -51,21 +51,3 @@ npm run dev      # http://localhost:4321
 npm run build    # outputs to dist/
 npm run preview  # preview the built output locally
 ```
-
----
-
-## Content conventions
-
-- **Two voices** — `profile.ts` has a `summary`/`summaryCorpo` pair and a `contactCta`/`contactCtaCorpo` pair. Nav.astro's toggle switches between them (`html.corpo` class); default is the personality voice. Keep both in sync when you change one.
-- **Company/institution logos** — `experience.ts` and `education.ts` items take an optional `logo: ImageMetadata`. Import from `src/assets/projects/Logos/`; the components render it as a small white chip so dark wordmarks stay legible in dark mode too.
-- **Mobile "Tell me more"** — Experience/Education bullet lists and the Hero summary's later paragraphs collapse behind a "Tell me more" button below 640px (always fully expanded on desktop). It's a plain `<button>` + a small inline `<script>` per component (not `<details>` — a forced-open-on-desktop `<details>` was tried first and broke in Chromium, which hides closed `<details>` content via an internal mechanism plain CSS can't override). If you add this pattern elsewhere, scope `querySelectorAll` to that section's `id` — two components sharing an unscoped class name will double-fire the same click.
-- **Favicon / brand mark** — regenerate `favicon.ico` from `favicon.svg` after editing it (e.g. via ImageMagick: `magick -background none favicon.svg -resize <size>x<size> favicon-<size>.png` for 16/32/48/64, then combine with `magick favicon-16.png favicon-32.png favicon-48.png favicon-64.png favicon.ico`). The same mark is duplicated inline in Nav.astro and Hero.astro so it renders in the site's actual font instead of a browser's favicon-context font fallback — update all three together.
-
----
-
-## Customisation
-
-- **Design tokens** (colours, fonts, spacing) are CSS variables defined in `src/layouts/Layout.astro` inside the `:root` block.
-- **Accent colour** — change `--accent` and `--accent-2` to update the highlight colour across the whole site.
-- **Font** — replace the Google Fonts `<link>` in `Layout.astro` and update `--font-sans` / `--font-mono`.
-- **Projects section** — add entries to `src/data/projects.ts`; the section appears automatically once the array is non-empty.
