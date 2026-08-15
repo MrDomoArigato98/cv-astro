@@ -57,7 +57,7 @@ const links = [
            conservative register. Wrapped so the first-visit nudge bubble
            can anchor to it. -->
       <div class="mode-toggle-wrap">
-        <button id="mode-toggle" class="icon-btn" aria-label="Toggle Corpo/Personality mode">
+        <button id="mode-toggle" class="icon-btn mode-btn" aria-label="Toggle Corpo/Personality mode">
           <svg class="icon-briefcase" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="7" width="20" height="14" rx="2"/>
             <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
@@ -68,6 +68,10 @@ const links = [
             <line x1="9" y1="9" x2="9.01" y2="9"/>
             <line x1="15" y1="9" x2="15.01" y2="9"/>
           </svg>
+          <!-- Label follows the same "shows what you'd switch INTO" convention
+               as the icon swap above. -->
+          <span class="mode-label mode-label-briefcase">Recruiter-safe mode</span>
+          <span class="mode-label mode-label-smile">Personality Mode</span>
         </button>
 
         <div id="mode-nudge" class="mode-nudge" aria-hidden="true">
@@ -249,6 +253,26 @@ const links = [
     background: var(--bg-hover);
   }
 
+  /* Mode toggle grows to fit its label instead of staying icon-only */
+  .mode-btn {
+    width: auto;
+    padding: 0 0.65rem;
+    gap: 0.4rem;
+  }
+
+  .mode-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Link strip is hidden below 600px, leaving nav-actions room to itself —
+     only bail to icon-only on genuinely tiny screens. */
+  @media (max-width: 340px) {
+    .mode-label { display: none !important; }
+    .mode-btn { width: 2rem; padding: 0; gap: 0; }
+  }
+
   /* ── Hamburger visibility ────────────────────────────────────── */
   /* Hide hamburger on desktop; hide desktop links on mobile */
   .mobile-only { display: none; }
@@ -319,6 +343,10 @@ const links = [
   .icon-smile { display: none; }
   :global(html.corpo) .icon-briefcase { display: none; }
   :global(html.corpo) .icon-smile     { display: block; }
+
+  .mode-label-smile { display: none; }
+  :global(html.corpo) .mode-label-briefcase { display: none; }
+  :global(html.corpo) .mode-label-smile     { display: inline; }
 
   /* ── First-visit mode nudge ──────────────────────────────────── */
   .mode-toggle-wrap {
