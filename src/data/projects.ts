@@ -32,9 +32,9 @@ const projects: ProjectItem[] = [
   {
     title: "Houseshare",
     description:
-      "When it comes to living with another person in an apartment, it turned out it's easier to build a whole application for managing chores, bills, and what needs to be done - rather than telling them about it. On the bright side there's no more hard feelings given machinery is doing the talking.",
+      "When it comes to living with another person in an apartment, it turned out it's easier to build a whole application for managing chores, bills, and what needs to be done — rather than telling them about it. On the bright side there's no more hard feelings given machinery is doing the talking.",
     moreDescription: [
-      "This allows me to spam him with emails when he leaves the dishes over night, automatically have scheduled tasks on a timetable (recurring and once-off), and each person in the household will receive a \"Daily Digest\" of things they need to do that day (not exactly the email you want to receive at 7 in the morning, but oh well). If you're going to ask me \"wait, how does the app know the dishes are dirty?\" - it doesn't, I just click \"nudge\" when I see them or make a \"once-off\" chore for the day assigned to him.",
+      "This allows me to spam him with emails when he leaves the dishes over night, automatically have scheduled tasks on a timetable (recurring and once-off), and each person in the household will receive a \"Daily Digest\" of things they need to do that day (not exactly the email you want to receive at 7 in the morning, but oh well). If you're going to ask me \"wait, how does the app know the dishes are dirty?\" — it doesn't, I just click \"nudge\" when I see them or make a \"once-off\" chore for the day assigned to him.",
       "Each person also gets notified for any recurring or once-off bills that must be paid, 2 days in advance. This also gives us a nice historical view of who's pulling their weight, and allows me to nudge the other person to do the responsible thing to keep the house clean for all of us.",
     ],
     tech: [

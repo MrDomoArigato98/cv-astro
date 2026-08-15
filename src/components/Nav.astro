@@ -11,6 +11,17 @@ const links = [
 
 <header>
   <nav>
+    <!-- Brand mark — same design as the favicon, inlined so it renders in
+         the site's actual JetBrains Mono (favicons can't rely on a webfont
+         being available, but the page already loads it). -->
+    <a href="#" class="brand" aria-label="Back to top">
+      <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="2" y="2" width="60" height="60" rx="13" fill="#111117" />
+        <text x="8" y="40" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="20" fill="#7b9fff">&gt;</text>
+        <text x="24" y="40" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="20" fill="#eeeef4">dd</text>
+      </svg>
+    </a>
+
     <!-- Desktop link strip — hidden on mobile -->
     <div class="link-scroll">
       <ul class="desktop-links">
@@ -147,6 +158,30 @@ const links = [
     justify-content: space-between;
     gap: 0.5rem;
     height: 3rem;
+  }
+
+  /* ── Brand mark ───────────────────────────────────────────────── */
+  .brand {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    line-height: 0;
+    transition: transform 0.2s;
+  }
+
+  .brand:hover {
+    transform: translateY(-1px);
+    background: none;
+  }
+
+  .brand svg {
+    display: block;
+  }
+
+  .brand svg rect {
+    stroke: var(--border);
+    stroke-width: 1;
   }
 
   /* ── Desktop link strip ───────────────────────────────────────── */

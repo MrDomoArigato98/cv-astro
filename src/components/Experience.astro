@@ -30,24 +30,57 @@ const { items } = Astro.props;
               <p class="company">
                 {item.logo && (
                   <span class="logo-badge">
-                    <Image src={item.logo} alt="" width={200} />
+                    <Image src={item.logo} alt="" width={200} loading="eager" decoding="sync" />
                   </span>
                 )}
                 {item.company}
               </p>
             </header>
 
-            <ul class="bullets">
-              {item.bullets.map((b) => (
-                <li>{b}</li>
-              ))}
-            </ul>
+            {/* Mobile-only — collapses the whole bullet list behind a
+                toggle so the card isn't a wall of text on a small screen.
+                Hidden entirely on desktop (see the min-width rule below),
+                where every bullet is always visible. A real <button> (not
+                a details/summary or checkbox hack) so it stays keyboard
+                accessible without fighting the browser's own open/close
+                behaviour. The grid-rows wrapper animates the reveal —
+                0fr → 1fr — instead of a hard display:none/block cut. */}
+            <div class="bullets-wrap" id={`bullets-${i}`}>
+              <ul class="bullets">
+                {item.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+
+            {item.bullets.length > 0 && (
+              <button
+                type="button"
+                class="bullets-toggle"
+                aria-expanded="false"
+                aria-controls={`bullets-${i}`}
+              >
+                Tell me more
+              </button>
+            )}
           </div>
         </article>
       ))}
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("#experience .bullets-toggle").forEach((btn) => {
+    const list = document.getElementById(btn.getAttribute("aria-controls")!);
+    btn.addEventListener("click", () => {
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      btn.textContent = expanded ? "Tell me more" : "Tell me less";
+      list?.classList.toggle("is-expanded", !expanded);
+    });
+  });
+</script>
 
 <style>
   .timeline {
@@ -159,8 +192,11 @@ const { items } = Astro.props;
     object-fit: contain;
   }
 
-  .bullets {
+  .bullets-wrap {
     margin-top: 0.85rem;
+  }
+
+  .bullets {
     padding-left: 1.1rem;
     display: flex;
     flex-direction: column;
@@ -171,5 +207,48 @@ const { items } = Astro.props;
     font-size: 0.875rem;
     color: var(--text-muted);
     line-height: 1.7;
+  }
+
+  /* ─── Mobile-only "Tell me more" for the bullet list ────────────
+     Collapsed by default below 640px, animated via a grid-rows trick
+     (0fr → 1fr) since height:auto can't be transitioned directly. The
+     button is hidden entirely above that breakpoint and the wrapper
+     falls back to a plain block, always fully visible. */
+  .bullets-toggle {
+    display: none;
+    margin-top: 0.6rem;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .bullets-toggle:hover { text-decoration: underline; }
+
+  @media (max-width: 639px) {
+    .bullets-toggle { display: inline-flex; width: fit-content; }
+
+    .bullets-wrap {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s var(--ease-spring);
+    }
+
+    .bullets-wrap.is-expanded {
+      grid-template-rows: 1fr;
+    }
+
+    .bullets-wrap > .bullets {
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bullets-wrap { transition: none; }
   }
 </style>
