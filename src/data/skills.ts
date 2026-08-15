@@ -13,7 +13,9 @@ const skills: SkillCategory[] = [
     items: [
       "AWS Cloud",
       "Google Cloud (GCP)",
+      "Microsoft Azure",
       "Infrastructure as Code (CDK, CloudFormation, SAM, Terraform, OpenTofu)",
+      "CI/CD (GitHub Actions, Jenkins)",
       "Docker",
       "Apache Kafka",
     ],

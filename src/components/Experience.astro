@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { ExperienceItem } from "../data/experience";
 
 interface Props {
@@ -26,7 +27,14 @@ const { items } = Astro.props;
                 {item.title}
                 {item.level && <span class="level">{item.level}</span>}
               </h3>
-              <p class="company">{item.company}</p>
+              <p class="company">
+                {item.logo && (
+                  <span class="logo-badge">
+                    <Image src={item.logo} alt="" width={200} />
+                  </span>
+                )}
+                {item.company}
+              </p>
             </header>
 
             <ul class="bullets">
@@ -126,6 +134,29 @@ const { items } = Astro.props;
     color: var(--accent);
     margin-top: 0.2rem;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    padding: 0.25rem 0.4rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+
+  .logo-badge img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: 3rem;
+    object-fit: contain;
   }
 
   .bullets {

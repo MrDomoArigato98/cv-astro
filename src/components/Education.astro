@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { EducationItem } from "../data/education";
 
 interface Props {
@@ -22,6 +23,11 @@ const { items } = Astro.props;
           <div class="edu-body">
             <h3 class="degree">{item.degree}</h3>
             <p class="institution">
+              {item.logo && (
+                <span class="logo-badge">
+                  <Image src={item.logo} alt="" width={200} />
+                </span>
+              )}
               {item.institution}
               {item.grade && <span class="grade">{item.grade}</span>}
             </p>
@@ -120,6 +126,26 @@ const { items } = Astro.props;
     padding: 0.1rem 0.45rem;
     border-radius: 4px;
     font-weight: 400;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    padding: 0.25rem 0.4rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+
+  .logo-badge img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: 3rem;
+    object-fit: contain;
   }
 
   .bullets {
