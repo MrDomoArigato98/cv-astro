@@ -12,34 +12,23 @@ const skills: SkillCategory[] = [
     category: "Cloud & Infrastructure",
     items: [
       "AWS Cloud",
-      "Serverless",
-      "Monitoring",
-      "AWS CDK",
-      "CloudFormation",
-      "SAM",
-      "Terraform",
+      "Google Cloud (GCP)",
+      "Infrastructure as Code (CDK, CloudFormation, SAM, Terraform, OpenTofu)",
       "Docker",
       "Apache Kafka",
-      "REST APIs",
     ],
   },
   {
     category: "Databases",
-    items: ["PostgreSQL", "Amazon RDS", "DynamoDB", "MongoDB"],
+    items: ["PostgreSQL", "Amazon RDS", "DynamoDB"],
+  },
+  {
+    category: "IT Administration & Identity",
+    items: ["Workspace ONE (MDM)", "Okta (SSO / Identity Management)", "Jira Administration"],
   },
   {
     category: "Languages",
-    items: ["English", "Polish", "Korean"],
-  },
-  {
-    category: "Soft Skills",
-    items: [
-      "Mentoring",
-      "Online Presentations",
-      "Technical Documentation",
-      "Knowledge Base Authoring",
-      "Public Speech",
-    ],
+    items: ["English", "Polish", "Czech"],
   },
 ];
 

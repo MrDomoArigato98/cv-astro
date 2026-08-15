@@ -27,16 +27,10 @@ const education: EducationItem[] = [
     location: "Seoul, South Korea",
     bullets: [
       "Awarded competitive scholarship for semester exchange at Hanyang University, Seoul, South Korea.",
-      "Completed advanced coursework in computer networking, linear algebra, and C# game development using Unity Engine.",
+      "Completed advanced coursework in computer networking, linear algebra (turns out people in Korea are pretty good at math, that was rough), and C# game development using Unity Engine.",
       "Achieved beginner-level Korean language proficiency through immersive cultural experience.",
     ],
   },
-];
-
-export const certifications: string[] = [
-  "AWS Certified Developer – Associate",
-  "AWS Certified Solutions Architect – Associate",
-  "AWS Lambda Subject Matter Expert (SME)",
 ];
 
 export default education;

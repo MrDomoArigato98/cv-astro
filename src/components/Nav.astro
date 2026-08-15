@@ -40,6 +40,29 @@ const links = [
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </button>
+
+      <!-- Corpo/Personality toggle — default is personality (Layout.astro's
+           pre-paint script), this switches Summary + Contact into a more
+           conservative register. Wrapped so the first-visit nudge bubble
+           can anchor to it. -->
+      <div class="mode-toggle-wrap">
+        <button id="mode-toggle" class="icon-btn" aria-label="Toggle Corpo/Personality mode">
+          <svg class="icon-briefcase" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+          <svg class="icon-smile" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+            <line x1="9" y1="9" x2="9.01" y2="9"/>
+            <line x1="15" y1="9" x2="15.01" y2="9"/>
+          </svg>
+        </button>
+
+        <div id="mode-nudge" class="mode-nudge" aria-hidden="true">
+          Choose your CV flavor
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -57,6 +80,8 @@ const links = [
   const menuToggle = document.getElementById("menu-toggle")!;
   const mobileMenu = document.getElementById("mobile-menu")!;
   const themeToggle = document.getElementById("theme-toggle")!;
+  const modeToggle = document.getElementById("mode-toggle")!;
+  const modeNudge = document.getElementById("mode-nudge")!;
 
   function openMenu() {
     mobileMenu.classList.add("is-open");
@@ -81,6 +106,25 @@ const links = [
     const isLight = document.documentElement.classList.toggle("light");
     localStorage.setItem("theme", isLight ? "light" : "dark");
   });
+
+  function dismissModeNudge() {
+    modeNudge.classList.remove("is-visible");
+  }
+
+  modeToggle.addEventListener("click", () => {
+    const isCorpo = document.documentElement.classList.toggle("corpo");
+    localStorage.setItem("mode", isCorpo ? "corpo" : "personality");
+    dismissModeNudge();
+  });
+
+  // Hint pointing at the mode toggle — shows on every page load (not just
+  // first-visit), so it's always there to point new eyes at the toggle.
+  // Stays up a full 6s regardless of clicks elsewhere on the page; only
+  // clicking the toggle itself (above) dismisses it early.
+  setTimeout(() => {
+    modeNudge.classList.add("is-visible");
+    setTimeout(dismissModeNudge, 6000);
+  }, 900);
 </script>
 
 <style>
@@ -232,4 +276,62 @@ const links = [
   .icon-moon { display: none; }
   :global(html.light) .icon-sun  { display: none; }
   :global(html.light) .icon-moon { display: block; }
+
+  /* ── Corpo/Personality icon swap ─────────────────────────────────
+     Same convention as sun/moon: the icon shown is what you'd switch
+     INTO. Default (personality) shows the briefcase (switch to corpo);
+     html.corpo shows the smiley (switch back to personality). */
+  .icon-smile { display: none; }
+  :global(html.corpo) .icon-briefcase { display: none; }
+  :global(html.corpo) .icon-smile     { display: block; }
+
+  /* ── First-visit mode nudge ──────────────────────────────────── */
+  .mode-toggle-wrap {
+    position: relative;
+  }
+
+  .mode-nudge {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: max-content;
+    max-width: 180px;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: 0 8px 24px -6px color-mix(in srgb, var(--accent) 30%, transparent);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease-spring), transform 0.3s var(--ease-spring);
+    z-index: 50;
+  }
+
+  /* Small triangle pointing back up at the toggle button */
+  .mode-nudge::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    background: var(--bg-card);
+    border-left: 1px solid var(--accent);
+    border-top: 1px solid var(--accent);
+    transform: rotate(45deg);
+  }
+
+  .mode-nudge.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mode-nudge { transition: none; }
+  }
 </style>

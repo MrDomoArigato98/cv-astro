@@ -40,8 +40,15 @@ const { profile } = Astro.props;
       </a>
     </nav>
 
-    <div class="summary">
+    <!-- Both registers render; Nav.astro's toggle (html.corpo) picks which
+         one is visible via CSS, same mechanism as the light/dark tokens. -->
+    <div class="summary summary-personality">
       {profile.summary.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+    </div>
+    <div class="summary summary-corpo">
+      {profile.summaryCorpo.map((paragraph) => (
         <p>{paragraph}</p>
       ))}
     </div>
@@ -151,6 +158,12 @@ const { profile } = Astro.props;
     line-height: 1.8;
     margin-top: 0.75rem;
   }
+
+  /* Corpo/Personality toggle — default (no html.corpo) shows personality,
+     matching Layout.astro's pre-paint default. */
+  .summary-corpo { display: none; }
+  :global(html.corpo) .summary-personality { display: none; }
+  :global(html.corpo) .summary-corpo       { display: block; }
 
   /* Global reset zeroes paragraph margins — space the summary's
      paragraphs back out from each other explicitly. */

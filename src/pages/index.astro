@@ -10,7 +10,7 @@ import Contact from "../components/Contact.astro";
 
 import profile from "../data/profile";
 import experience from "../data/experience";
-import education, { certifications } from "../data/education";
+import education from "../data/education";
 import skills from "../data/skills";
 import projects from "../data/projects";
 ---
@@ -20,7 +20,7 @@ import projects from "../data/projects";
   <main>
     <Hero profile={profile} />
     <Experience items={experience} />
-    <Education items={education} certifications={certifications} />
+    <Education items={education} />
     <Skills categories={skills} />
     <Projects items={projects} />
     <Contact profile={profile} />

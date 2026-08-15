@@ -25,6 +25,12 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     <script is:inline>
       if (localStorage.getItem("theme") !== "dark") document.documentElement.classList.add("light");
     </script>
+    <!-- Same pre-paint pattern for Corpo/Personality mode (Nav.astro's
+         toggle) — default is personality; only an explicit "corpo" choice
+         switches Summary/Contact into the more conservative phrasing. -->
+    <script is:inline>
+      if (localStorage.getItem("mode") === "corpo") document.documentElement.classList.add("corpo");
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

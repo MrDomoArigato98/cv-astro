@@ -3,10 +3,9 @@ import type { EducationItem } from "../data/education";
 
 interface Props {
   items: EducationItem[];
-  certifications: string[];
 }
 
-const { items, certifications } = Astro.props;
+const { items } = Astro.props;
 ---
 
 <section class="section" id="education">
@@ -35,17 +34,6 @@ const { items, certifications } = Astro.props;
         </article>
       ))}
     </div>
-
-    {certifications.length > 0 && (
-      <div class="certs">
-        <h3 class="certs-label">Certifications</h3>
-        <ul class="cert-list">
-          {certifications.map((c) => (
-            <li class="cert-pill">{c}</li>
-          ))}
-        </ul>
-      </div>
-    )}
   </div>
 </section>
 
@@ -148,35 +136,4 @@ const { items, certifications } = Astro.props;
     line-height: 1.7;
   }
 
-  /* Certifications subsection */
-  .certs {
-    margin-top: 2.5rem;
-  }
-
-  .certs-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 1rem;
-  }
-
-  .cert-list {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-  }
-
-  .cert-pill {
-    padding: 0.45rem 1rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-    /* Subtle left accent using box-shadow so no pseudo-element is needed */
-    box-shadow: inset 3px 0 0 var(--accent-2);
-  }
 </style>

@@ -13,9 +13,8 @@ const { profile } = Astro.props;
     <h2 class="section-title">Contact</h2>
 
     <div class="contact-card">
-      <p class="cta">
-        If you need someone to talk to here's my contacts.
-      </p>
+      <p class="cta cta-personality">{profile.contactCta}</p>
+      <p class="cta cta-corpo">{profile.contactCtaCorpo}</p>
 
       <div class="contact-links">
         <a href={`mailto:${profile.email}`} class="contact-btn primary">
@@ -62,6 +61,10 @@ const { profile } = Astro.props;
     max-width: 55ch;
     line-height: 1.7;
   }
+
+  .cta-corpo { display: none; }
+  :global(html.corpo) .cta-personality { display: none; }
+  :global(html.corpo) .cta-corpo       { display: block; }
 
   .contact-links {
     display: flex;

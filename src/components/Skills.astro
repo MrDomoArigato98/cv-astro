@@ -12,6 +12,13 @@ const { categories } = Astro.props;
   <div class="section-inner">
     <h2 class="section-title">Skills</h2>
 
+    <p class="skills-intro">
+      What I reach for when something's broken — or when a ticket says I have to.
+    </p>
+    <p class="skills-note">
+      Half of this list is "read the docs once, shipped anyway." The other half I actually know.
+    </p>
+
     <div class="skills-grid">
       {categories.map((cat, i) => (
         <div class="skill-group" data-animate style={`--delay: ${i * 60}ms`}>
@@ -28,6 +35,23 @@ const { categories } = Astro.props;
 </section>
 
 <style>
+  .skills-intro {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    max-width: 65ch;
+    line-height: 1.7;
+  }
+
+  .skills-note {
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--text-dim);
+    max-width: 65ch;
+    line-height: 1.6;
+    margin-top: 0.35rem;
+    margin-bottom: 1.5rem;
+  }
+
   .skills-grid {
     display: grid;
     /* Auto-fill so columns collapse naturally on narrow screens */
