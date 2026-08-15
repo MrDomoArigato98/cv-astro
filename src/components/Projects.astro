@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { ProjectItem } from "../data/projects";
 
 interface Props {
@@ -39,7 +40,94 @@ const { items } = Astro.props;
               </div>
             </div>
 
-            <p class="project-desc">{project.description}</p>
+            {(() => {
+              // Slug per project so multiple cards' radio groups/ids never collide.
+              const slug = project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+              const hasArchitecture = project.architecture && project.architecture.length > 0;
+
+              const overview = (
+                <>
+                  <p class="project-desc">{project.description}</p>
+
+                  {project.moreDescription && project.moreDescription.length > 0 && (
+                    <details class="project-more">
+                      <summary></summary>
+                      {project.moreDescription.map((paragraph) => (
+                        <p>{paragraph}</p>
+                      ))}
+                    </details>
+                  )}
+
+                  {project.screenshots && project.screenshots.length > 0 && (
+                    <div class="carousel">
+                      <div class="carousel-viewport">
+                        <div class="carousel-track">
+                          {project.screenshots.map((shot) => (
+                            <div class="carousel-slide">
+                              <Image
+                                src={shot.src}
+                                alt={shot.alt}
+                                widths={[400, 700, 1000]}
+                                sizes="(max-width: 700px) 90vw, 700px"
+                                loading="lazy"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        <button type="button" class="carousel-btn carousel-prev" aria-label="Previous screenshot">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="15 18 9 12 15 6" />
+                          </svg>
+                        </button>
+                        <button type="button" class="carousel-btn carousel-next" aria-label="Next screenshot">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div class="carousel-dots">
+                        {project.screenshots.map((shot, si) => (
+                          <button
+                            type="button"
+                            class:list={["carousel-dot", { active: si === 0 }]}
+                            aria-label={`Go to screenshot ${si + 1}: ${shot.alt}`}
+                          />
+                        ))}
+                      </div>
+                      <p class="carousel-caption">{project.screenshots[0].alt}</p>
+                    </div>
+                  )}
+                </>
+              );
+
+              // No architecture notes — skip the tab chrome entirely, just show Overview.
+              if (!hasArchitecture) return overview;
+
+              return (
+                <div class="tabs">
+                  <input type="radio" name={`tabs-${slug}`} id={`tab-${slug}-overview`} class="tab-radio" data-tab="overview" checked />
+                  <label for={`tab-${slug}-overview`} class="tab-label">Overview</label>
+                  <input type="radio" name={`tabs-${slug}`} id={`tab-${slug}-architecture`} class="tab-radio" data-tab="architecture" />
+                  <label for={`tab-${slug}-architecture`} class="tab-label">Architecture</label>
+
+                  <div class="tab-panel" data-panel="overview">
+                    <div class="tab-panel-inner">{overview}</div>
+                  </div>
+
+                  <div class="tab-panel" data-panel="architecture">
+                    <div class="tab-panel-inner">
+                      <ul class="architecture-list">
+                        {project.architecture!.map((point) => (
+                          <li>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             <ul class="tech-list">
               {project.tech.map((t) => (
@@ -69,6 +157,12 @@ const { items } = Astro.props;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  /* A card with screenshots has enough going on that it should take the
+     full grid width rather than sit cramped in a 320px column. */
+  .project-card:has(.carousel) {
+    grid-column: 1 / -1;
   }
 
   .project-card:hover {
@@ -108,7 +202,210 @@ const { items } = Astro.props;
     font-size: 0.875rem;
     color: var(--text-muted);
     line-height: 1.7;
-    flex: 1;
+  }
+
+  /* ─── Read more ─────────────────────────────────────────── */
+  .project-more {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .project-more > p {
+    margin-top: 0.75rem;
+  }
+
+  .project-more summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent);
+    list-style: none;
+    width: fit-content;
+  }
+
+  .project-more summary::-webkit-details-marker { display: none; }
+
+  .project-more summary::after {
+    content: "Read more";
+  }
+
+  .project-more[open] summary::after {
+    content: "Read less";
+  }
+
+  .project-more summary:hover { text-decoration: underline; }
+
+  /* ─── Carousel ───────────────────────────────────────────── */
+  .carousel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.25rem;
+  }
+
+  .carousel-viewport {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s var(--ease-spring);
+  }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    display: flex;
+  }
+
+  .carousel-slide :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+    color: var(--text);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .carousel-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .carousel-prev { left: 0.5rem; }
+  .carousel-next { right: 0.5rem; }
+
+  .carousel-dots {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .carousel-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: var(--text-dim);
+    cursor: pointer;
+  }
+
+  .carousel-dot.active { background: var(--accent); }
+
+  .carousel-caption {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  /* ─── Tabs (Overview / Architecture) ────────────────────────
+     Radio-driven, no JS — :checked toggles the matching panel via a
+     general sibling selector, which is naturally scoped to siblings
+     within the same .tabs container, so no per-card unique CSS is needed. */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .tab-radio {
+    /* Visually hidden but still focusable/clickable via its <label> —
+       avoids display:none, which would break keyboard navigation. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .tab-label {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .tab-radio[data-tab="overview"]:checked ~ label[for$="-overview"],
+  .tab-radio[data-tab="architecture"]:checked ~ label[for$="-architecture"] {
+    color: var(--bg);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .tab-radio:focus-visible + .tab-label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .tab-panel {
+    /* Grid-rows accordion trick: animating 0fr -> 1fr smoothly grows/shrinks
+       the panel instead of snapping instantly via display:none/block, which
+       is jarring when Overview (tall, has the carousel) and Architecture
+       (short, just a bullet list) differ this much in height. */
+    display: grid;
+    grid-template-rows: 0fr;
+    /* Force each panel onto its own line below the tab-label row. */
+    flex-basis: 100%;
+    width: 100%;
+    transition: grid-template-rows 0.4s var(--ease-spring);
+  }
+
+  .tab-panel-inner {
+    overflow: hidden;
+    min-height: 0;
+    margin-top: 1rem;
+  }
+
+  .tab-radio[data-tab="overview"]:checked ~ .tab-panel[data-panel="overview"],
+  .tab-radio[data-tab="architecture"]:checked ~ .tab-panel[data-panel="architecture"] {
+    grid-template-rows: 1fr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab-panel { transition: none; }
+  }
+
+  .architecture-list {
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .architecture-list li {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
   }
 
   .tech-list {
@@ -126,6 +423,33 @@ const { items } = Astro.props;
     border-radius: 4px;
     font-size: 0.75rem;
     font-family: var(--font-mono);
-    color: var(--text-dim);
+    color: var(--text-muted);
   }
 </style>
+
+<script>
+  // Plain-JS carousel — no framework on this site, so each .carousel wires
+  // itself up the same way Layout.astro's scroll-reveal/nav-highlight do.
+  document.querySelectorAll<HTMLElement>(".carousel").forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>(".carousel-track");
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>(".carousel-slide"));
+    const dots = Array.from(carousel.querySelectorAll<HTMLElement>(".carousel-dot"));
+    const caption = carousel.querySelector<HTMLElement>(".carousel-caption");
+    const prevBtn = carousel.querySelector<HTMLElement>(".carousel-prev");
+    const nextBtn = carousel.querySelector<HTMLElement>(".carousel-next");
+    const alts = slides.map((slide) => slide.querySelector("img")?.alt ?? "");
+
+    let index = 0;
+
+    function show(i: number) {
+      index = (i + slides.length) % slides.length;
+      if (track) track.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach((dot, di) => dot.classList.toggle("active", di === index));
+      if (caption) caption.textContent = alts[index];
+    }
+
+    prevBtn?.addEventListener("click", () => show(index - 1));
+    nextBtn?.addEventListener("click", () => show(index + 1));
+    dots.forEach((dot, di) => dot.addEventListener("click", () => show(di)));
+  });
+</script>

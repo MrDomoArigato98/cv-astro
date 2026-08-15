@@ -40,7 +40,11 @@ const { profile } = Astro.props;
       </a>
     </nav>
 
-    <p class="summary">{profile.summary}</p>
+    <div class="summary">
+      {profile.summary.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+    </div>
   </div>
 </section>
 
@@ -146,5 +150,11 @@ const { profile } = Astro.props;
     max-width: 72ch;
     line-height: 1.8;
     margin-top: 0.75rem;
+  }
+
+  /* Global reset zeroes paragraph margins — space the summary's
+     paragraphs back out from each other explicitly. */
+  .summary p + p {
+    margin-top: 0.9rem;
   }
 </style>

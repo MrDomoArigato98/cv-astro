@@ -18,9 +18,12 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     <meta name="description" content={metaDescription} />
     <meta name="author" content={profile.name} />
     <title>{profile.name} — CV</title>
-    <!-- Read saved theme before first paint to avoid a flash of dark/light -->
+    <!-- Read saved theme before first paint to avoid a flash of dark/light.
+         Default is light — only an explicit "dark" choice (via the toggle
+         in Nav.astro) keeps it dark; a first-time visitor with no stored
+         preference gets light. -->
     <script is:inline>
-      if (localStorage.getItem("theme") === "light") document.documentElement.classList.add("light");
+      if (localStorage.getItem("theme") !== "dark") document.documentElement.classList.add("light");
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
