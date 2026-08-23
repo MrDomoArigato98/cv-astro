@@ -37,7 +37,7 @@ const profile: Profile = {
     "Cloud experience spans AWS, GCP, and Azure, with Infrastructure as Code via CDK, CloudFormation, Terraform, and OpenTofu, and CI/CD through GitHub Actions and Jenkins. Also comfortable in application code (Python, TypeScript, React) and in identity and device management (Okta, Workspace ONE, Jira Administration).",
     "At Collibra, this comes together as an IT Infrastructure Engineer — owning infrastructure as code across a multi-cloud environment, plus the identity, access, and device management that keeps the org running.",
   ],
-  contactCta: "If you want someone to talk to here's my contacts.",
+  contactCta: "If you want someone to talk to here's my contacts :-)",
   contactCtaCorpo: "Interested in working together? Reach out via email or connect on LinkedIn.",
 };
 
