@@ -1,0 +1,233 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+// Shared card list for Experience and Education — index.astro maps each
+// data file onto this shape.
+export interface TimelineEntry {
+  title: string;
+  // Small pill next to the title (job level, degree grade)
+  badge?: string;
+  org: string;
+  logo?: ImageMetadata;
+  period: string;
+  location: string;
+  bullets: string[];
+}
+
+interface Props {
+  id: string;
+  heading: string;
+  entries: TimelineEntry[];
+}
+
+const { id, heading, entries } = Astro.props;
+---
+
+<section class="section" id={id}>
+  <div class="section-inner">
+    <h2 class="section-title">{heading}</h2>
+
+    <div class="timeline">
+      {entries.map((entry, i) => (
+        <article class="entry" data-animate style={`--delay: ${i * 80}ms`}>
+          <div class="entry-meta">
+            <span class="period">{entry.period}</span>
+            <span class="location">{entry.location}</span>
+          </div>
+
+          <div class="entry-body">
+            <h3 class="entry-title">
+              {entry.title}
+              {entry.badge && <span class="badge">{entry.badge}</span>}
+            </h3>
+            <p class="org">
+              {entry.logo && (
+                <span class="logo-badge">
+                  <Image src={entry.logo} alt="" width={200} loading="eager" decoding="sync" />
+                </span>
+              )}
+              <span>{entry.org}</span>
+            </p>
+
+            {/* First bullet always visible; the rest collapse on mobile
+                only (see .collapse in Layout.astro), so a phone still shows
+                one real achievement per entry instead of just a title. */}
+            <ul class="bullets">
+              {entry.bullets.slice(0, 1).map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+
+            {entry.bullets.length > 1 && (
+              <>
+                <div class="collapse" id={`${id}-bullets-${i}`}>
+                  <div>
+                    <ul class="bullets bullets-more">
+                      {entry.bullets.slice(1).map((b) => (
+                        <li>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="collapse-toggle"
+                  aria-expanded="false"
+                  aria-controls={`${id}-bullets-${i}`}
+                >
+                  Tell me more
+                </button>
+              </>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* A plain timeline, not cards — entries are divided by hairlines and
+     nothing lifts on hover, since nothing here is clickable. */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1.5rem 0;
+  }
+
+  .entry:first-child { padding-top: 0; }
+  .entry:last-child  { padding-bottom: 0; }
+  .entry + .entry    { border-top: 1px solid var(--border); }
+
+  .entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+  }
+
+  /* Stack meta above body on mobile, side-by-side on wider screens */
+  @media (min-width: 640px) {
+    .entry {
+      grid-template-columns: 9rem 1fr;
+      gap: 1.5rem;
+    }
+
+    .entry-meta {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding-top: 0.15rem;
+    }
+  }
+
+  .period {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .location {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .entry-title {
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--accent-2);
+    background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+  }
+
+  /* Logo stays beside the name; a long name wraps inside its own span
+     instead of pushing the logo onto a line of its own. Not accent-coloured:
+     accent is reserved for things you can click. */
+  .org {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  /* White chip so dark wordmarks stay legible in dark mode */
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    padding: 0.25rem 0.4rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+
+  .logo-badge img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: 3rem;
+    object-fit: contain;
+  }
+
+  .bullets {
+    margin-top: 0.85rem;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  /* The collapsed part continues the first list. Spaced with padding on
+     the inner list, which the collapse's overflow:hidden child clips. */
+  .bullets-more {
+    margin-top: 0;
+    padding-top: 0.45rem;
+  }
+
+  .bullets li {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  @media print {
+    .entry {
+      grid-template-columns: 10rem 1fr;
+      gap: 1rem;
+      padding: 0.45rem 0;
+      border: none !important;
+      break-inside: avoid;
+    }
+
+    .entry-meta {
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .bullets { margin-top: 0.4rem; gap: 0.2rem; }
+    .bullets-more { margin-top: 0; padding-top: 0.2rem; }
+    .bullets li { line-height: 1.5; }
+  }
+</style>

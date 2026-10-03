@@ -9,16 +9,16 @@ const skills: SkillCategory[] = [
     items: ["Python", "TypeScript", "JavaScript", "React", "Express.js", "Node.js", "HTML", "CSS", "Git"],
   },
   {
-    category: "Cloud & Infrastructure",
-    items: [
-      "AWS Cloud",
-      "Google Cloud (GCP)",
-      "Microsoft Azure",
-      "Infrastructure as Code (CDK, CloudFormation, SAM, Terraform, OpenTofu)",
-      "CI/CD (GitHub Actions, Jenkins)",
-      "Docker",
-      "Apache Kafka",
-    ],
+    category: "Cloud",
+    items: ["AWS", "Google Cloud (GCP)", "Microsoft Azure"],
+  },
+  {
+    category: "Infrastructure as Code",
+    items: ["Terraform", "OpenTofu", "AWS CDK", "CloudFormation", "AWS SAM"],
+  },
+  {
+    category: "CI/CD & Platforms",
+    items: ["GitHub Actions", "Jenkins", "Docker", "Apache Kafka"],
   },
   {
     category: "Databases",

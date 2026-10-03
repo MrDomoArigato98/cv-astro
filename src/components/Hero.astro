@@ -6,15 +6,24 @@ interface Props {
 }
 
 const { profile } = Astro.props;
+
+// Both registers render; Nav.astro's toggle (html.corpo) picks which one is
+// visible via CSS, same mechanism as the light/dark tokens.
+const voices = [
+  { voice: "personality", paragraphs: profile.summary },
+  { voice: "corpo", paragraphs: profile.summaryCorpo },
+];
 ---
 
 <section class="section hero" id="about">
   <div class="section-inner">
     <div class="name-row">
+      <!-- Text uses var(--font-mono) via CSS below — the self-hosted font's
+           family name is hashed, so it can't be named in an attribute. -->
       <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
         <rect x="2" y="2" width="60" height="60" rx="13" fill="#111117" />
-        <text x="8" y="40" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="20" fill="#7b9fff">&gt;</text>
-        <text x="24" y="40" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="20" fill="#eeeef4">dd</text>
+        <text x="8" y="40" font-weight="600" font-size="20" fill="#7b9fff">&gt;</text>
+        <text x="24" y="40" font-weight="700" font-size="20" fill="#eeeef4">dd</text>
       </svg>
       <h1>{profile.name}</h1>
     </div>
@@ -25,90 +34,79 @@ const { profile } = Astro.props;
       </svg>
       {profile.location}
     </p>
+    <ul class="facts">
+      {profile.highlights.map((fact) => (
+        <li>{fact}</li>
+      ))}
+    </ul>
 
+    <!-- On paper the pills print their actual address instead of a label. -->
     <nav class="links" aria-label="Contact and social links">
       <a href={`mailto:${profile.email}`} class="link-pill">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
         </svg>
-        Email
+        <span class="screen-only">Email</span>
+        <span class="print-only">{profile.email}</span>
       </a>
       <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="link-pill">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
         </svg>
-        LinkedIn
+        <span class="screen-only">LinkedIn</span>
+        <span class="print-only">{profile.linkedin.replace("https://", "")}</span>
       </a>
       <a href={profile.website} target="_blank" rel="noopener noreferrer" class="link-pill">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
-        Website
+        <span class="screen-only">Website</span>
+        <span class="print-only">{profile.website.replace("https://", "")}</span>
       </a>
+      <!-- Opens the browser's print dialog — print styles (Layout.astro and
+           each component) turn the page into a clean CV, in whichever
+           voice is currently active. -->
+      <button type="button" id="save-pdf" class="link-pill pdf-btn screen-only">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Save as PDF
+      </button>
     </nav>
 
-    <!-- Both registers render; Nav.astro's toggle (html.corpo) picks which
-         one is visible via CSS, same mechanism as the light/dark tokens.
-         Each keeps its first 2 paragraphs always visible and collapses the
-         rest behind a "Tell me more" button on mobile only — same pattern
-         as Experience.astro's bullet toggle (real <button>, no details). -->
-    <div class="summary summary-personality">
-      {profile.summary.slice(0, 2).map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
-      <div class="summary-extra" id="summary-personality-extra">
-        <div class="summary-extra-inner">
-          {profile.summary.slice(2).map((paragraph) => (
-            <p>{paragraph}</p>
-          ))}
-        </div>
+    <!-- First 2 paragraphs always visible; the rest collapse behind
+         "Tell me more" on mobile only (.collapse in Layout.astro). -->
+    {voices.map(({ voice, paragraphs }) => (
+      <div class={`summary summary-${voice}`}>
+        {paragraphs.slice(0, 2).map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+        {paragraphs.length > 2 && (
+          <>
+            <div class="collapse summary-extra" id={`summary-${voice}-extra`}>
+              <div>
+                {paragraphs.slice(2).map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+            <button
+              type="button"
+              class="collapse-toggle"
+              aria-expanded="false"
+              aria-controls={`summary-${voice}-extra`}
+            >
+              Tell me more
+            </button>
+          </>
+        )}
       </div>
-      {profile.summary.length > 2 && (
-        <button
-          type="button"
-          class="summary-toggle"
-          aria-expanded="false"
-          aria-controls="summary-personality-extra"
-        >
-          Tell me more
-        </button>
-      )}
-    </div>
-    <div class="summary summary-corpo">
-      {profile.summaryCorpo.slice(0, 2).map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
-      <div class="summary-extra" id="summary-corpo-extra">
-        <div class="summary-extra-inner">
-          {profile.summaryCorpo.slice(2).map((paragraph) => (
-            <p>{paragraph}</p>
-          ))}
-        </div>
-      </div>
-      {profile.summaryCorpo.length > 2 && (
-        <button
-          type="button"
-          class="summary-toggle"
-          aria-expanded="false"
-          aria-controls="summary-corpo-extra"
-        >
-          Tell me more
-        </button>
-      )}
-    </div>
+    ))}
   </div>
 </section>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>(".summary-toggle").forEach((btn) => {
-    const extra = document.getElementById(btn.getAttribute("aria-controls")!);
-    btn.addEventListener("click", () => {
-      const expanded = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!expanded));
-      btn.textContent = expanded ? "Tell me more" : "Tell me less";
-      extra?.classList.toggle("is-expanded", !expanded);
-    });
-  });
+  document.getElementById("save-pdf")?.addEventListener("click", () => window.print());
 </script>
 
 <style>
@@ -153,6 +151,7 @@ const { profile } = Astro.props;
   h1       { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
   .title   { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
   .location{ animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+  .facts   { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both; }
   .links   { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both; }
   .summary { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
 
@@ -174,6 +173,8 @@ const { profile } = Astro.props;
     stroke-width: 1;
   }
 
+  .mark text { font-family: var(--font-mono); }
+
   h1 {
     font-size: clamp(2rem, 7vw, 3rem);
     font-weight: 700;
@@ -182,9 +183,10 @@ const { profile } = Astro.props;
     line-height: 1.15;
   }
 
+  /* Not accent-coloured: accent is reserved for things you can click */
   .title {
-    font-size: 1rem;
-    color: var(--accent);
+    font-size: 1.0625rem;
+    color: var(--text);
     font-weight: 500;
   }
 
@@ -194,6 +196,24 @@ const { profile } = Astro.props;
     gap: 0.35rem;
     color: var(--text-muted);
     font-size: 0.875rem;
+  }
+
+  /* Separator after each item (not before), so a wrapped line on mobile
+     never starts with a stray dot. */
+  .facts {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .facts li:not(:last-child)::after {
+    content: "·";
+    margin: 0 0.6rem;
+    color: var(--text-dim);
   }
 
   .links {
@@ -225,6 +245,12 @@ const { profile } = Astro.props;
     text-decoration: none;
   }
 
+  .pdf-btn {
+    font-family: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+
   .summary {
     font-size: 0.9375rem;
     color: var(--text-muted);
@@ -239,59 +265,47 @@ const { profile } = Astro.props;
   :global(html.corpo) .summary-personality { display: none; }
   :global(html.corpo) .summary-corpo       { display: block; }
 
-  /* Global reset zeroes paragraph margins — space the summary's
-     paragraphs back out from each other explicitly. */
-  .summary p + p {
-    margin-top: 0.9rem;
-  }
+  /* Global reset zeroes paragraph margins — space the summary's paragraphs
+     back out. The collapsed ones' margins sit inside the collapse's
+     overflow:hidden child, so they vanish with it on mobile. */
+  .summary p + p,
+  .summary-extra p { margin-top: 0.9rem; }
 
-  /* Desktop: unwrap both layers so the extra paragraphs flow like any
-     other — .summary-extra-inner's own p+p margin (below) is what spaces
-     them, since the "p + p" rule above only matches direct children of
-     .summary. */
-  .summary-extra { display: contents; }
-  .summary-extra-inner { display: contents; }
-  .summary-extra-inner p { margin-top: 0.9rem; }
-
-  .summary-toggle {
-    display: none;
-    margin-top: 0.75rem;
-    padding: 0;
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 0.8125rem;
-    color: var(--accent);
-    cursor: pointer;
-  }
-
-  .summary-toggle:hover { text-decoration: underline; }
-
-  /* Mobile-only collapse — desktop always shows every paragraph, same as
-     Experience.astro's bullet toggle. Animated via the grid-rows trick
-     (0fr → 1fr) instead of a hard display:none/block cut. */
-  @media (max-width: 639px) {
-    .summary-toggle { display: inline-flex; width: fit-content; }
-
-    .summary-extra {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.35s var(--ease-spring);
+  @media print {
+    .hero {
+      padding: 0 0 1.2rem;
+      overflow: visible;
     }
 
-    .summary-extra.is-expanded {
-      grid-template-rows: 1fr;
+    .hero::before { display: none; }
+
+    .section-inner { gap: 0.25rem; }
+
+    h1 { font-size: 2.3rem; }
+
+    .links {
+      gap: 0.25rem 1.25rem;
+      margin-top: 0.35rem;
     }
 
-    .summary-extra-inner {
-      display: block;
-      overflow: hidden;
-      min-height: 0;
+    .link-pill {
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--text-muted);
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .summary-extra { transition: none; }
+    .summary {
+      max-width: none;
+      line-height: 1.55;
+      margin-top: 0.5rem;
+    }
+
+    .summary p + p,
+    .summary-extra p { margin-top: 0.45rem; }
+
+    /* Five personality paragraphs are too much on paper — print the first
+       two. Beats Layout.astro's global ".collapse { display: block }". */
+    .summary-personality .summary-extra { display: none !important; }
   }
 </style>

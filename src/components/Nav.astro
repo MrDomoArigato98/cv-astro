@@ -13,12 +13,14 @@ const links = [
   <nav>
     <!-- Brand mark — same design as the favicon, inlined so it renders in
          the site's actual JetBrains Mono (favicons can't rely on a webfont
-         being available, but the page already loads it). -->
+         being available, but the page already loads it). The font comes
+         from var(--font-mono) in CSS below — the self-hosted family name is
+         hashed, so it can't be named in an attribute. -->
     <a href="#" class="brand" aria-label="Back to top">
       <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true">
         <rect x="2" y="2" width="60" height="60" rx="13" fill="#111117" />
-        <text x="8" y="40" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="20" fill="#7b9fff">&gt;</text>
-        <text x="24" y="40" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="20" fill="#eeeef4">dd</text>
+        <text x="8" y="40" font-weight="600" font-size="20" fill="#7b9fff">&gt;</text>
+        <text x="24" y="40" font-weight="700" font-size="20" fill="#eeeef4">dd</text>
       </svg>
     </a>
 
@@ -81,8 +83,9 @@ const links = [
     </div>
   </nav>
 
-  <!-- Mobile dropdown — toggled by the hamburger button -->
-  <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+  <!-- Mobile dropdown — toggled by the hamburger button. `inert` while
+       closed, so its links can't be tabbed to while invisible. -->
+  <div id="mobile-menu" class="mobile-menu" inert>
     <ul>
       {links.map((l) => (
         <li><a href={l.href} class="mobile-link">{l.label}</a></li>
@@ -101,13 +104,13 @@ const links = [
   function openMenu() {
     mobileMenu.classList.add("is-open");
     menuToggle.setAttribute("aria-expanded", "true");
-    mobileMenu.setAttribute("aria-hidden", "false");
+    mobileMenu.inert = false;
   }
 
   function closeMenu() {
     mobileMenu.classList.remove("is-open");
     menuToggle.setAttribute("aria-expanded", "false");
-    mobileMenu.setAttribute("aria-hidden", "true");
+    mobileMenu.inert = true;
   }
 
   menuToggle.addEventListener("click", () => {
@@ -187,6 +190,8 @@ const links = [
     stroke: var(--border);
     stroke-width: 1;
   }
+
+  .brand svg text { font-family: var(--font-mono); }
 
   /* ── Desktop link strip ───────────────────────────────────────── */
   .link-scroll {
@@ -394,7 +399,17 @@ const links = [
     transform: translateY(0);
   }
 
+  /* On phones the bubble lands on top of the hero name, and the toggle
+     already shows its "Recruiter-safe mode" label — skip it there. */
+  @media (max-width: 600px) {
+    .mode-nudge { display: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .mode-nudge { transition: none; }
+  }
+
+  @media print {
+    header { display: none; }
   }
 </style>

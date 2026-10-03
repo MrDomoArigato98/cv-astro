@@ -1,4 +1,5 @@
 ---
+import { Font } from "astro:assets";
 import type { Profile } from "../data/profile";
 
 interface Props {
@@ -7,7 +8,24 @@ interface Props {
 
 const { profile } = Astro.props;
 
+const title = `${profile.name} — CV`;
 const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${profile.location}.`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// 1200×630 link-preview card (LinkedIn, Slack, etc.) — a static image in
+// public/, regenerate it by hand if the name or title changes.
+const ogImage = new URL("/og.png", Astro.site);
+
+// schema.org Person — lets search engines tie the page to the person.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  jobTitle: profile.title,
+  url: profile.website,
+  email: `mailto:${profile.email}`,
+  address: profile.location,
+  sameAs: [profile.linkedin],
+};
 ---
 
 <!doctype html>
@@ -17,9 +35,27 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={metaDescription} />
     <meta name="author" content={profile.name} />
-    <title>{profile.name} — CV</title>
+    <title>{title}</title>
+    <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name} — ${profile.title}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-jetbrains-mono" />
+    <!-- Scroll-reveal content starts at opacity 0 and relies on JS to show
+         it — without JS, show it straight away. -->
+    <noscript><style>[data-animate] { opacity: 1 !important; transform: none !important; }</style></noscript>
     <!-- Read saved theme before first paint to avoid a flash of dark/light.
          Default is light — only an explicit "dark" choice (via the toggle
          in Nav.astro) keeps it dark; a first-time visitor with no stored
@@ -33,12 +69,6 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     <script is:inline>
       if (localStorage.getItem("mode") === "corpo") document.documentElement.classList.add("corpo");
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
     <slot />
@@ -58,13 +88,15 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     --text-muted:#9898b8;
     --text-dim:  #63637a;
 
-    --font-sans: "Inter", system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", monospace;
+    /* --font-inter / --font-jetbrains-mono come from the Font components
+       above (configured in astro.config.mjs). */
+    --font-sans: var(--font-inter), system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains-mono);
 
     --radius:    8px;
     --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
     /* Clamp so sections breathe on desktop but stay tight on mobile */
-    --section-gap: clamp(2.5rem, 6vw, 5rem);
+    --section-gap: clamp(2rem, 4.5vw, 3.75rem);
     --content-width: 860px;
   }
 
@@ -113,16 +145,26 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     margin: 0 auto;
   }
 
+  /* Terminal-path style ("~/experience"), echoing the > dd mark. The h2
+     text itself stays "Experience" — lowercase and "~/" are CSS only, and
+     the "/ ''" alt text keeps screen readers from announcing "tilde slash". */
   .section-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: lowercase;
+    color: var(--text-muted);
+    margin-bottom: 1.75rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .section-title::before {
+    content: "~/" / "";
+    color: var(--text-dim);
+    /* cancel the flex gap so "~/" hugs the name */
+    margin-right: -0.75rem;
   }
 
   .section-title::after {
@@ -130,10 +172,6 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
     flex: 1;
     height: 1px;
     background: var(--border);
-  }
-
-  .section + .section {
-    border-top: 1px solid var(--border);
   }
 
   /* ─── Scroll-reveal ─────────────────────────────────────────── */
@@ -160,6 +198,108 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
       transition: none;
     }
     * { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+  }
+
+  /* ─── Mobile-only "Tell me more" collapse ──────────────────────
+     Markup: a .collapse wrapper (with an id) around ONE inner element,
+     plus a <button class="collapse-toggle" aria-controls="that-id">.
+     Collapsed below 640px, animated via the grid-rows trick (0fr → 1fr)
+     since height:auto can't be transitioned. Always fully visible on
+     desktop, where the button is hidden. A real <button>, deliberately
+     not <details> — Chromium hides closed-details content via an internal
+     mechanism CSS can't override, so it can't be forced open on desktop or
+     in print. The click handler is the single script at the bottom of this
+     file. */
+  .collapse-toggle {
+    display: none;
+    margin-top: 0.65rem;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .collapse-toggle:hover { text-decoration: underline; }
+
+  @media (max-width: 639px) {
+    .collapse-toggle { display: inline-flex; width: fit-content; }
+
+    .collapse {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s var(--ease-spring);
+    }
+
+    .collapse.is-expanded { grid-template-rows: 1fr; }
+
+    .collapse > * {
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .collapse { transition: none; }
+  }
+
+  /* ─── Print / "Save as PDF" ────────────────────────────────────
+     Hero.astro's button calls window.print(). Whatever voice is active
+     (personality / corpo) is what gets printed. Component-specific print
+     rules live in each component's own <style>. */
+  .print-only { display: none; }
+
+  @media print {
+    @page { margin: 14mm 15mm; }
+
+    /* Always print on white, whatever the screen theme */
+    html, html.light {
+      --bg:        #fff;
+      --bg-card:   #fff;
+      --bg-hover:  #fff;
+      --border:    #d4d4dc;
+      --accent:    #2f50d0;
+      --accent-2:  #5b3fc4;
+      --text:      #111117;
+      --text-muted:#33334a;
+      --text-dim:  #5a5a70;
+      font-size: 13px;
+    }
+
+    body { line-height: 1.5; }
+
+    .print-only  { display: revert; }
+    .screen-only { display: none !important; }
+
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    [data-animate] { opacity: 1 !important; transform: none !important; }
+
+    /* Everything collapsible is expanded on paper */
+    .collapse-toggle { display: none !important; }
+    .collapse { display: block !important; }
+    .collapse > * { overflow: visible !important; }
+
+    .section { padding: 0 0 1.4rem; }
+
+    /* Plain CV headings on paper — "~/experience" is a screen flourish */
+    .section-title {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+      break-after: avoid;
+    }
+
+    .section-title::before { content: none; }
   }
 </style>
 
@@ -196,4 +336,16 @@ const metaDescription = `CV of ${profile.name} — ${profile.title} based in ${p
   );
 
   document.querySelectorAll("section[id]").forEach((s) => navObserver.observe(s));
+
+  // ── "Tell me more" collapse (styles above) ─────────────────────
+  // One handler for the whole page, so components never double-bind.
+  document.querySelectorAll<HTMLButtonElement>(".collapse-toggle").forEach((btn) => {
+    const target = document.getElementById(btn.getAttribute("aria-controls")!);
+    btn.addEventListener("click", () => {
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      btn.textContent = expanded ? "Tell me more" : "Tell me less";
+      target?.classList.toggle("is-expanded", !expanded);
+    });
+  });
 </script>

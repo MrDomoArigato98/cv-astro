@@ -19,18 +19,22 @@ const { categories } = Astro.props;
       Half of this list is "read the docs once, shipped anyway." The other half I actually know. It's on me to figure it out.
     </p>
 
-    <div class="skills-grid">
+    <!-- One row per category (label | tags) rather than a card grid, so
+         rows of different lengths never leave a ragged grid. -->
+    <dl class="skills-list">
       {categories.map((cat, i) => (
-        <div class="skill-group" data-animate style={`--delay: ${i * 60}ms`}>
-          <h3 class="cat-name">{cat.category}</h3>
-          <ul class="tag-list">
-            {cat.items.map((item) => (
-              <li class="tag">{item}</li>
-            ))}
-          </ul>
+        <div class="skill-row" data-animate style={`--delay: ${i * 50}ms`}>
+          <dt class="cat-name">{cat.category}</dt>
+          <dd>
+            <ul class="tag-list">
+              {cat.items.map((item) => (
+                <li class="tag">{item}</li>
+              ))}
+            </ul>
+          </dd>
         </div>
       ))}
-    </div>
+    </dl>
   </div>
 </section>
 
@@ -49,37 +53,40 @@ const { categories } = Astro.props;
     max-width: 65ch;
     line-height: 1.6;
     margin-top: 0.35rem;
-    margin-bottom: 1.5rem;
   }
 
-  .skills-grid {
+  /* The joke undercuts the list — keep it out of recruiter-safe mode */
+  :global(html.corpo) .skills-note { display: none; }
+
+  .skills-list {
+    margin-top: 1.75rem;
+  }
+
+  .skill-row {
     display: grid;
-    /* Auto-fill so columns collapse naturally on narrow screens */
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-    gap: 1.25rem;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.9rem 0;
   }
 
-  .skill-group {
-    padding: 1.25rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  }
+  .skill-row:first-child { padding-top: 0; }
+  .skill-row + .skill-row { border-top: 1px solid var(--border); }
 
-  .skill-group:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
-    transform: translateY(-2px);
+  /* Same label column width as the Experience/Education dates */
+  @media (min-width: 640px) {
+    .skill-row {
+      grid-template-columns: 9rem 1fr;
+      gap: 1.5rem;
+      align-items: baseline;
+    }
   }
 
   .cat-name {
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 0.875rem;
+    color: var(--text-dim);
   }
 
   .tag-list {
@@ -90,12 +97,30 @@ const { categories } = Astro.props;
   }
 
   .tag {
-    padding: 0.25rem 0.65rem;
+    padding: 0.2rem 0.6rem;
     background: var(--bg-hover);
     border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 0.8rem;
     font-family: var(--font-mono);
     color: var(--text-muted);
+  }
+
+  @media print {
+    .skills-intro,
+    .skills-note { display: none; }
+
+    .skills-list { margin-top: 0; }
+
+    .skill-row {
+      grid-template-columns: 10rem 1fr;
+      gap: 1rem;
+      padding: 0.2rem 0;
+      border: none !important;
+      break-inside: avoid;
+    }
+
+    .tag-list { gap: 0.25rem; }
+    .tag { padding: 0.05rem 0.4rem; font-size: 0.75rem; }
   }
 </style>

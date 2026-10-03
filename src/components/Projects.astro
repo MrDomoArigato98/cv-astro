@@ -7,6 +7,9 @@ interface Props {
 }
 
 const { items } = Astro.props;
+
+// Printed in place of the screenshots / long write-up (see @media print)
+const projectsUrl = new URL("#projects", Astro.site).href.replace("https://", "");
 ---
 
 {items.length > 0 && (
@@ -48,6 +51,7 @@ const { items } = Astro.props;
               const overview = (
                 <>
                   <p class="project-desc">{project.description}</p>
+                  <p class="print-only project-link">Screenshots and architecture write-up: {projectsUrl}</p>
 
                   {project.moreDescription && project.moreDescription.length > 0 && (
                     <details class="project-more">
@@ -61,7 +65,9 @@ const { items } = Astro.props;
                   {project.screenshots && project.screenshots.length > 0 && (
                     <div class="carousel">
                       <div class="carousel-viewport">
-                        <div class="carousel-track">
+                        {/* A native scroll-snap container: swipeable on touch,
+                            arrow-key scrollable once focused. */}
+                        <div class="carousel-track" tabindex="0" role="region" aria-label={`${project.title} screenshots`}>
                           {project.screenshots.map((shot) => (
                             <div class="carousel-slide">
                               <Image
@@ -156,20 +162,12 @@ const { items } = Astro.props;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
 
   /* A card with screenshots has enough going on that it should take the
      full grid width rather than sit cramped in a 320px column. */
   .project-card:has(.carousel) {
     grid-column: 1 / -1;
-  }
-
-  .project-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent),
-                0 8px 28px -6px color-mix(in srgb, var(--accent) 10%, transparent);
-    transform: translateY(-3px);
   }
 
   .card-top {
@@ -255,12 +253,23 @@ const { items } = Astro.props;
 
   .carousel-track {
     display: flex;
-    transition: transform 0.4s var(--ease-spring);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .carousel-track::-webkit-scrollbar { display: none; }
+
+  .carousel-track:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
   }
 
   .carousel-slide {
     flex: 0 0 100%;
     display: flex;
+    scroll-snap-align: start;
   }
 
   .carousel-slide :global(img) {
@@ -425,13 +434,46 @@ const { items } = Astro.props;
     font-family: var(--font-mono);
     color: var(--text-muted);
   }
+
+  /* Paper: the short version — description, tech tags and a pointer to
+     the site. The screenshots, "Tell me more" text and Architecture tab
+     stay on screen. */
+  @media print {
+    .project-card {
+      padding: 0;
+      border: none;
+      gap: 0.4rem;
+      break-inside: avoid;
+    }
+
+    .carousel,
+    .tab-label,
+    .card-links,
+    .project-more,
+    .tab-panel[data-panel="architecture"] { display: none; }
+
+    /* Overview panel shown regardless of which tab was last picked */
+    .tab-panel[data-panel="overview"] { grid-template-rows: 1fr !important; }
+    .tab-panel-inner { overflow: visible; margin-top: 0; }
+
+    .project-desc { line-height: 1.5; }
+
+    .project-link {
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+  }
 </style>
 
 <script>
-  // Plain-JS carousel — no framework on this site, so each .carousel wires
-  // itself up the same way Layout.astro's scroll-reveal/nav-highlight do.
+  // Plain-JS carousel over a native scroll-snap track — no framework on
+  // this site, so each .carousel wires itself up the same way Layout.astro's
+  // scroll-reveal/nav-highlight do.
+  const scrollBehavior: ScrollBehavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+
   document.querySelectorAll<HTMLElement>(".carousel").forEach((carousel) => {
-    const track = carousel.querySelector<HTMLElement>(".carousel-track");
+    const track = carousel.querySelector<HTMLElement>(".carousel-track")!;
     const slides = Array.from(carousel.querySelectorAll<HTMLElement>(".carousel-slide"));
     const dots = Array.from(carousel.querySelectorAll<HTMLElement>(".carousel-dot"));
     const caption = carousel.querySelector<HTMLElement>(".carousel-caption");
@@ -441,15 +483,23 @@ const { items } = Astro.props;
 
     let index = 0;
 
-    function show(i: number) {
-      index = (i + slides.length) % slides.length;
-      if (track) track.style.transform = `translateX(-${index * 100}%)`;
-      dots.forEach((dot, di) => dot.classList.toggle("active", di === index));
-      if (caption) caption.textContent = alts[index];
+    // Buttons and dots only scroll the track; the scroll listener is the one
+    // place that syncs dots + caption, so swipes and arrow keys update them too.
+    function go(i: number) {
+      const target = (i + slides.length) % slides.length;
+      track.scrollTo({ left: target * track.clientWidth, behavior: scrollBehavior });
     }
 
-    prevBtn?.addEventListener("click", () => show(index - 1));
-    nextBtn?.addEventListener("click", () => show(index + 1));
-    dots.forEach((dot, di) => dot.addEventListener("click", () => show(di)));
+    track.addEventListener("scroll", () => {
+      const i = Math.min(slides.length - 1, Math.round(track.scrollLeft / track.clientWidth));
+      if (i === index) return;
+      index = i;
+      dots.forEach((dot, di) => dot.classList.toggle("active", di === index));
+      if (caption) caption.textContent = alts[index];
+    }, { passive: true });
+
+    prevBtn?.addEventListener("click", () => go(index - 1));
+    nextBtn?.addEventListener("click", () => go(index + 1));
+    dots.forEach((dot, di) => dot.addEventListener("click", () => go(di)));
   });
 </script>

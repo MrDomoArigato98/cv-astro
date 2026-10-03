@@ -2,8 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
-import Experience from "../components/Experience.astro";
-import Education from "../components/Education.astro";
+import Timeline from "../components/Timeline.astro";
 import Skills from "../components/Skills.astro";
 import Projects from "../components/Projects.astro";
 import Contact from "../components/Contact.astro";
@@ -19,8 +18,16 @@ import projects from "../data/projects";
   <Nav />
   <main>
     <Hero profile={profile} />
-    <Experience items={experience} />
-    <Education items={education} />
+    <Timeline
+      id="experience"
+      heading="Experience"
+      entries={experience.map((e) => ({ ...e, org: e.company, badge: e.level }))}
+    />
+    <Timeline
+      id="education"
+      heading="Education"
+      entries={education.map((e) => ({ ...e, title: e.degree, org: e.institution, badge: e.grade }))}
+    />
     <Skills categories={skills} />
     <Projects items={projects} />
     <Contact profile={profile} />

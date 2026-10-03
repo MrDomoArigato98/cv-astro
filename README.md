@@ -10,9 +10,8 @@ A statically generated CV/portfolio site built with [Astro](https://astro.build)
 src/
 ├── components/         # One Astro component per section
 │   ├── Nav.astro        # Links, theme toggle, Corpo/Personality toggle, brand mark
-│   ├── Hero.astro       # Name, title, contact links, summary
-│   ├── Experience.astro
-│   ├── Education.astro
+│   ├── Hero.astro       # Name, title, contact links, Save-as-PDF button, summary
+│   ├── Timeline.astro   # Experience and Education cards (index.astro maps both data files onto it)
 │   ├── Skills.astro
 │   ├── Projects.astro
 │   └── Contact.astro
@@ -27,14 +26,20 @@ src/
 │       ├── Logos/        # Company/institution logos used in Experience & Education
 │       └── houseshare/   # Screenshots for the Houseshare project card
 ├── layouts/
-│   └── Layout.astro     # HTML shell, global CSS, design tokens, favicon links
+│   └── Layout.astro     # HTML shell, meta/Open Graph tags, fonts, global CSS + print CSS, design tokens
 └── pages/
     └── index.astro      # Assembles all components
 
 public/
 ├── favicon.svg           # Source favicon (also inlined in Nav.astro / Hero.astro as the brand mark)
-└── favicon.ico           # Multi-res fallback, generated from favicon.svg
+├── favicon.ico           # Multi-res fallback, generated from favicon.svg
+└── og.png                # 1200×630 link-preview image — static, update it if name/title change
 ```
+
+## Notes
+
+- **PDF version** — the "Save as PDF" button opens the browser's print dialog. Print styles (`@media print` in `Layout.astro` and each component) turn the page into a 2-page A4 CV, in whichever voice (Personality / Recruiter-safe) is active.
+- **Fonts** — self-hosted at build time via Astro's Fonts API (`astro.config.mjs`), referenced only through `--font-inter` / `--font-jetbrains-mono`.
 
 ---
 
